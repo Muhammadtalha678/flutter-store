@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:newstore/auth/login.dart';
 import 'package:newstore/constants/constants.dart';
 import 'package:newstore/constants/media_query.dart';
+import 'package:newstore/provider/allData_provider.dart';
 import 'package:newstore/provider/dashboard_provider.dart';
 import 'package:newstore/provider/location_provider.dart';
 import 'package:newstore/provider/login_provider.dart';
@@ -228,74 +229,113 @@ class BannerPage extends StatelessWidget {
       body: SafeArea(
         child: Consumer<DashboardProvider>(
           builder: (context, value, child) {
+            if (value.networkError) {
+              return SizedBox.shrink();
+            }
             if (value.banner.isEmpty) {
+              // print("object1");
               if (!value.isLoading) {
+                print("object");
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  context.read<DashboardProvider>().getImages();
+                  context.read<DashboardProvider>().getImages(context);
                 });
               }
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              return Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: width(context) * 0.05,
-                    vertical: height(context) * 0.05),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        Navigator.pushNamed(context, '/dashboard');
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        // height: 50,
-                        height: height(context) * 0.2,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          image: DecorationImage(
-                            image: NetworkImage(value.banner[0].bannerImage),
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                      ),
-                      // print(value.banner[0].bannerImage);
-                    ),
-                    // Center(
-                    //   child: ElevatedButton(
-                    //       onPressed: () async {
-                    //         // print("object");
-                    //         // if (await Permission.location.isGranted) {
-                    //         try {
-                    //           final link =
-                    //               await http.get(Uri.parse("https://www.google.com/"));
-                    //           if (link.statusCode == 200) {
-                    //             Navigator.pushNamed(context, '/googleMap');
-                    //           } else {
-                    //             throw Exception();
-                    //           }
-                    //         } catch (e) {
-                    //           // ignore: use_build_context_synchronously
-                    //           ScaffoldMessenger.of(context).showSnackBar(
-                    //             const SnackBar(
-                    //               duration: Duration(seconds: 1),
-                    //               behavior: SnackBarBehavior.floating,
-                    //               backgroundColor: Colors.transparent,
-                    //               elevation: 0,
-                    //               content: SnackBarError(
-                    //                 text: "Internet Connection Error",
-                    //               ),
-                    //             ),
-                    //           );
-                    //         }
 
-                    //       },
-                    //       child: Text("data")),
-                    // ),
-                  ],
+              return Center(
+                child: CircularProgressIndicator(
+                  color: Colors.green,
+                  strokeWidth: 2,
                 ),
               );
+            } else {
+              return Consumer<AllDataProvider>(
+                  builder: (context, allValue, child) {
+                if (allValue.isLoading) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.green,
+                      strokeWidth: 2,
+                    ),
+                  );
+                }
+                return Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: width(context) * 0.05,
+                      vertical: height(context) * 0.05),
+                  child: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          var cate =
+                              await context.read<AllDataProvider>().allData();
+
+                          if (cate == false) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                duration: Duration(seconds: 1),
+                                behavior: SnackBarBehavior.floating,
+                                backgroundColor: Colors.transparent,
+                                elevation: 0,
+                                content: SnackBarError(
+                                  text: "Network Error",
+                                ),
+                              ),
+                            );
+                          } else {
+                            Navigator.pushNamed(context, '/dashboard');
+                          }
+
+                          // Navigator.pushNamed(context, '/dashboard');
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          // height: 50,
+                          height: height(context) * 0.2,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            image: DecorationImage(
+                              image: NetworkImage(value.banner[0].bannerImage),
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                        ),
+                        // print(value.banner[0].bannerImage);
+                      ),
+                      // Center(
+                      //   child: ElevatedButton(
+                      //       onPressed: () async {
+                      //         // print("object");
+                      //         // if (await Permission.location.isGranted) {
+                      //         try {
+                      //           final link =
+                      //               await http.get(Uri.parse("https://www.google.com/"));
+                      //           if (link.statusCode == 200) {
+                      //             Navigator.pushNamed(context, '/googleMap');
+                      //           } else {
+                      //             throw Exception();
+                      //           }
+                      //         } catch (e) {
+                      //           // ignore: use_build_context_synchronously
+                      //           ScaffoldMessenger.of(context).showSnackBar(
+                      //             const SnackBar(
+                      //               duration: Duration(seconds: 1),
+                      //               behavior: SnackBarBehavior.floating,
+                      //               backgroundColor: Colors.transparent,
+                      //               elevation: 0,
+                      //               content: SnackBarError(
+                      //                 text: "Internet Connection Error",
+                      //               ),
+                      //             ),
+                      //           );
+                      //         }
+
+                      //       },
+                      //       child: Text("data")),
+                      // ),
+                    ],
+                  ),
+                );
+              });
             }
           },
         ),

@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:newstore/auth/confirm_emial.dart';
 import 'package:newstore/auth/login.dart';
 import 'package:newstore/auth/register.dart';
+import 'package:newstore/pages/all_category.dart';
 import 'package:newstore/pages/dashboard.dart';
 import 'package:newstore/pages/google_map.dart';
+import 'package:newstore/pages/product_category.dart';
+import 'package:newstore/provider/allData_provider.dart';
 import 'package:newstore/provider/dashboard_provider.dart';
 import 'package:newstore/provider/location_provider.dart';
 import 'package:newstore/provider/login_provider.dart';
@@ -33,6 +36,9 @@ void main() {
       ),
       ChangeNotifierProvider(
         create: (context) => LocationProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => AllDataProvider(),
       ),
     ],
     child: const MyApp(),
@@ -70,6 +76,8 @@ class MyApp extends StatelessWidget {
         '/confirmEmail': (context) => ConfirmEmail(),
         '/googleMap': (context) => MapScreen(),
         '/dashboard': (context) => Dashboard(),
+        '/allCategories': (context) => AllCategory(),
+        '/productByCategory': (context) => ProductByCategory(),
       },
       // home: const SplashScreen(),
     );
